@@ -311,7 +311,7 @@
 
     <script>
         const studyPlan = {
-            "2024-09-24": {
+            "2025-09-24": {
                 title: "MIÉRCOLES 24/09",
                 isExam: false,
                 tasks: [
@@ -320,7 +320,7 @@
                     { time: "22:00 – 23:00", description: "Ejercicios Tema 6 de Álgebra" }
                 ]
             },
-            "2024-09-25": {
+            "2025-09-25": {
                 title: "JUEVES 25/09",
                 isExam: false,
                 tasks: [
@@ -777,8 +777,8 @@
             const nextButton = document.getElementById('nextDay');
             
             const today = new Date();
-            const firstDay = new Date('2024-09-24');
-            const lastDay = new Date('2024-10-19');
+            const firstDay = new Date('2025-09-24');
+            const lastDay = new Date('2025-10-19');
             
             prevButton.disabled = currentDate <= firstDay;
             nextButton.disabled = currentDate >= lastDay;
@@ -813,8 +813,8 @@
 
         // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
-            // Establecer la fecha actual como 24 de septiembre de 2024 para empezar el plan
-            currentDate = new Date('2024-09-24');
+            // Establecer la fecha actual como 24 de septiembre de 2025 para empezar el plan
+            currentDate = new Date('2025-09-24');
             
             displayCurrentDate();
             displayDay();
