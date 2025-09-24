@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Estudios - Agustín</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .date-display {
+            font-size: 1.1rem;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .day-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .day-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .day-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #f7fafc;
+            border-radius: 12px;
+            border-left: 4px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.completed {
+            background: #f0fff4;
+            border-left-color: #48bb78;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e0;
+            margin-right: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .task-checkbox.checked {
+            background: #48bb78;
+            border-color: #48bb78;
+        }
+
+        .task-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .task-text {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .task-time {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .task-description {
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .prev-button {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .prev-button:hover:not(:disabled) {
+            background: #cbd5e0;
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .next-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .pending-tasks {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pending-tasks h4 {
+            color: #c53030;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .reset-button {
+            background: #fc8181;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 15px;
+        }
+
+        .reset-button:hover {
+            background: #f56565;
+        }
+
+        .exam-day {
+            border: 2px solid #fbd38d !important;
+            background: linear-gradient(135deg, #fef5e7, #fed7aa) !important;
+        }
+
+        .exam-indicator {
+            background: #f6ad55;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .day-section {
+                padding: 20px 15px;
+            }
+
+            .task-item {
+                padding: 12px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+
+            .nav-button {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Plan de Estudios - Agustín</h1>
+            <div class="date-display" id="currentDate"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% completado</div>
+        </div>
+
+        <div class="day-section" id="daySection">
+            <!-- El contenido se genera dinámicamente -->
+        </div>
+
+        <div class="navigation">
+            <button class="nav-button prev-button" id="prevDay">← Día Anterior</button>
+            <button class="nav-button next-button" id="nextDay">Día Siguiente →</button>
+        </div>
+    </div>
+
+    <script>
+        const studyPlan = {
+            "2024-09-24": {
+                title: "MIÉRCOLES 24/09",
+                isExam: false,
+                tasks: [
+                    { time: "18:00 – 20:00", description: "Resumir Texto 1 de Desarrollo de Software" },
+                    { time: "20:00 – 22:00", description: "Resumir Texto 2" },
+                    { time: "22:00 – 23:00", description: "Ejercicios Tema 6 de Álgebra" }
+                ]
+            },
+            "2024-09-25": {
+                title: "JUEVES 25/09",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 11:00", description: "Resumir Texto 3" },
+                    { time: "11:00 – 13:00", description: "Resumir Texto 4" },
+                    { time: "15:00 – 17:00", description: "Ver Clase 2 de SO (2h)" },
+                    { time: "18:00 – 20:00", description: "Estudiar Estadística descriptiva" },
+                    { time: "20:00 – 22:00", description: "Completar ejercicios Tema 6 Álgebra" }
+                ]
+            },
+            "2024-09-26": {
+                title: "VIERNES 26/09",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 11:00", description: "Resumir Texto 5" },
+                    { time: "11:00 – 13:00", description: "Resumir Texto 6 (terminar resúmenes)" },
+                    { time: "15:00 – 17:00", description: "Ver Clase 3 de SO (2h)" },
+                    { time: "18:00 – 20:00", description: "Estudiar Probabilidad" },
+                    { time: "20:00 – 22:00", description: "Tema 7 Álgebra (teoría)" }
+                ]
+            },
+            "2024-09-27": {
+                title: "SÁBADO 27/09",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Hacer Guía 1 Desarrollo Software" },
+                    { time: "15:00 – 17:00", description: "Ver Clase 4 de SO (2h)" },
+                    { time: "18:00 – 20:00", description: "Estudiar Variables aleatorias y distribuciones" },
+                    { time: "20:00 – 22:00", description: "Ejercicios Tema 7 de Álgebra" }
+                ]
+            },
+            "2024-09-28": {
+                title: "DOMINGO 28/09",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Hacer Guía 2 Desarrollo Software" },
+                    { time: "15:00 – 17:00", description: "Ver Clase 5 de SO (2h)" },
+                    { time: "18:00 – 20:00", description: "Estudiar Modelos discretos" },
+                    { time: "20:00 – 22:00", description: "Repaso rápido de 6 textos" }
+                ]
+            },
+            "2024-09-29": {
+                title: "LUNES 29/09",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Parcial viejo Probabilidad y Estadística" },
+                    { time: "15:00 – 17:00", description: "Ver Clase 6 de SO (2h)" },
+                    { time: "18:00 – 20:00", description: "Repaso resúmenes y guías Desarrollo Software" },
+                    { time: "20:00 – 22:00", description: "Ejercicios Tema 7 Álgebra" }
+                ]
+            },
+            "2024-09-30": {
+                title: "MARTES 30/09",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Repaso general Probabilidad y Estadística" },
+                    { time: "15:00 – 17:00", description: "Ver Clase 7 de SO (2h)" },
+                    { time: "18:00 – 20:00", description: "Repaso 10 textos Desarrollo Software" },
+                    { time: "20:00 – 22:00", description: "Ejercicios rápidos Probabilidad" }
+                ]
+            },
+            "2024-10-01": {
+                title: "MIÉRCOLES 01/10 - EXAMEN Probabilidad y Estadística",
+                isExam: true,
+                examSubject: "Probabilidad y Estadística",
+                tasks: [
+                    { time: "Mañana", description: "Repaso final de fórmulas y errores típicos" },
+                    { time: "Examen", description: "EXAMEN Probabilidad y Estadística" },
+                    { time: "15:00 – 17:00", description: "Ver Clase 8 de SO (2h)" },
+                    { time: "18:00 – 20:00", description: "Ejercicios Tema 7 Álgebra" },
+                    { time: "20:00 – 22:00", description: "Repaso textos Desarrollo Software" }
+                ]
+            },
+            "2024-10-02": {
+                title: "JUEVES 02/10 - EXAMEN Desarrollo Software",
+                isExam: true,
+                examSubject: "Desarrollo Software",
+                tasks: [
+                    { time: "Mañana", description: "Repaso final textos + guías" },
+                    { time: "Examen", description: "EXAMEN Desarrollo Software" },
+                    { time: "Tarde/Noche", description: "Revisión ejercicios Álgebra (tema 6 y 7)" }
+                ]
+            },
+            "2024-10-03": {
+                title: "VIERNES 03/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto Desarrollo Software (estructura básica)" },
+                    { time: "15:00 – 17:00", description: "Estudiar Unidad 1 de SO" },
+                    { time: "18:00 – 20:00", description: "Repaso Álgebra tema 6" },
+                    { time: "20:00 – 22:00", description: "Ejercicios tema 7" }
+                ]
+            },
+            "2024-10-04": {
+                title: "SÁBADO 04/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 1" },
+                    { time: "15:00 – 17:00", description: "Unidad 2 SO" },
+                    { time: "18:00 – 20:00", description: "Álgebra tema 7 teoría" },
+                    { time: "20:00 – 22:00", description: "Ejercicios mixtos" }
+                ]
+            },
+            "2024-10-05": {
+                title: "DOMINGO 05/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 2" },
+                    { time: "15:00 – 17:00", description: "Unidad 3 SO" },
+                    { time: "18:00 – 20:00", description: "Repaso tema 6 y 7 Álgebra" },
+                    { time: "20:00 – 22:00", description: "Parcial viejo Álgebra" }
+                ]
+            },
+            "2024-10-06": {
+                title: "LUNES 06/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 3" },
+                    { time: "15:00 – 17:00", description: "Unidad 4 SO" },
+                    { time: "18:00 – 20:00", description: "Repaso fórmulas Álgebra" },
+                    { time: "20:00 – 22:00", description: "Ejercicios cortos" }
+                ]
+            },
+            "2024-10-07": {
+                title: "MARTES 07/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 4" },
+                    { time: "15:00 – 17:00", description: "Unidad 5 SO" },
+                    { time: "18:00 – 20:00", description: "Ejercicios integradores Álgebra" },
+                    { time: "20:00 – 22:00", description: "Resumen SO" }
+                ]
+            },
+            "2024-10-08": {
+                title: "MIÉRCOLES 08/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 5" },
+                    { time: "15:00 – 17:00", description: "Unidad 6 SO" },
+                    { time: "18:00 – 20:00", description: "Ejercicios tema 7" },
+                    { time: "20:00 – 22:00", description: "Repaso SO 1–6" }
+                ]
+            },
+            "2024-10-09": {
+                title: "JUEVES 09/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 6" },
+                    { time: "15:00 – 17:00", description: "Unidad 7 SO" },
+                    { time: "18:00 – 20:00", description: "Parcial viejo Álgebra" },
+                    { time: "20:00 – 22:00", description: "Corrección de errores" }
+                ]
+            },
+            "2024-10-10": {
+                title: "VIERNES 10/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 7" },
+                    { time: "15:00 – 17:00", description: "Unidad 8 SO" },
+                    { time: "18:00 – 20:00", description: "Ejercicios integradores Álgebra" },
+                    { time: "20:00 – 22:00", description: "Mapa conceptual SO" }
+                ]
+            },
+            "2024-10-11": {
+                title: "SÁBADO 11/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 8" },
+                    { time: "15:00 – 17:00", description: "Repaso SO (U1–4)" },
+                    { time: "18:00 – 20:00", description: "Repaso Álgebra tema 6" },
+                    { time: "20:00 – 22:00", description: "Ejercicios tema 7" }
+                ]
+            },
+            "2024-10-12": {
+                title: "DOMINGO 12/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 9" },
+                    { time: "15:00 – 17:00", description: "Repaso SO (U5–8)" },
+                    { time: "18:00 – 20:00", description: "Parciales viejos Álgebra" },
+                    { time: "20:00 – 22:00", description: "Repaso teórico Álgebra" }
+                ]
+            },
+            "2024-10-13": {
+                title: "LUNES 13/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 10" },
+                    { time: "15:00 – 17:00", description: "Parcial viejo SO" },
+                    { time: "18:00 – 20:00", description: "Parcial viejo Álgebra" },
+                    { time: "20:00 – 22:00", description: "Corrección" }
+                ]
+            },
+            "2024-10-14": {
+                title: "MARTES 14/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 11" },
+                    { time: "15:00 – 17:00", description: "Repaso SO (U1–6)" },
+                    { time: "18:00 – 20:00", description: "Repaso Álgebra tema 6" },
+                    { time: "20:00 – 22:00", description: "Ejercicios de refuerzo" }
+                ]
+            },
+            "2024-10-15": {
+                title: "MIÉRCOLES 15/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 12" },
+                    { time: "15:00 – 17:00", description: "Repaso SO (U7–8)" },
+                    { time: "18:00 – 20:00", description: "Repaso Álgebra tema 7" },
+                    { time: "20:00 – 22:00", description: "Ejercicios mixtos" }
+                ]
+            },
+            "2024-10-16": {
+                title: "JUEVES 16/10",
+                isExam: false,
+                tasks: [
+                    { time: "09:00 – 12:00", description: "Proyecto módulo 13" },
+                    { time: "15:00 – 17:00", description: "Parcial viejo SO" },
+                    { time: "18:00 – 20:00", description: "Parcial viejo Álgebra" },
+                    { time: "20:00 – 22:00", description: "Corrección" }
+                ]
+            },
+            "2024-10-17": {
+                title: "VIERNES 17/10 - EXAMEN SO",
+                isExam: true,
+                examSubject: "SO",
+                tasks: [
+                    { time: "Mañana", description: "Repaso express SO" },
+                    { time: "Examen", description: "EXAMEN SO" },
+                    { time: "Tarde/Noche", description: "Repaso Álgebra temas 6–7" }
+                ]
+            },
+            "2024-10-18": {
+                title: "SÁBADO 18/10 - EXAMEN Álgebra",
+                isExam: true,
+                examSubject: "Álgebra",
+                tasks: [
+                    { time: "Mañana", description: "Repaso final Álgebra" },
+                    { time: "Examen", description: "EXAMEN Álgebra" },
+                    { time: "Tarde/Noche", description: "Avance final Proyecto" }
+                ]
+            },
+            "2024-10-19": {
+                title: "DOMINGO 19/10 - Entrega Proyecto",
+                isExam: false,
+                tasks: [
+                    { time: "Mañana", description: "Ajustes finales y revisión" },
+                    { time: "Entrega", description: "Entrega Proyecto" },
+                    { time: "Tarde", description: "Descanso" }
+                ]
+            }
+        };
+
+        let currentDate = new Date();
+        let taskStates = JSON.parse(localStorage.getItem('taskStates')) || {};
+        let pendingTasks = JSON.parse(localStorage.getItem('pendingTasks')) || {};
+
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function getDateKey(offset = 0) {
+            const date = new Date(currentDate);
+            date.setDate(date.getDate() + offset);
+            return formatDate(date);
+        }
+
+        function displayCurrentDate() {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = 
+                currentDate.toLocaleDateString('es-ES', options);
+        }
+
+        function updateProgress() {
+            const today = formatDate(currentDate);
+            const dayData = studyPlan[today];
+            
+            if (!dayData) {
+                document.getElementById('progressText').textContent = 'Sin actividades programadas';
+                document.getElementById('progressFill').style.width = '0%';
+                return;
+            }
+
+            const totalTasks = dayData.tasks.length + (pendingTasks[today] ? pendingTasks[today].length : 0);
+            const completedTasks = Object.keys(taskStates[today] || {}).filter(key => 
+                taskStates[today][key]).length;
+            
+            const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+            
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = 
+                `${completedTasks}/${totalTasks} tareas completadas (${Math.round(progress)}%)`;
+        }
+
+        function createTaskElement(task, index, isPending = false, originalDate = null) {
+            const today = formatDate(currentDate);
+            const taskKey = isPending ? `pending-${originalDate}-${index}` : `task-${index}`;
+            const isCompleted = taskStates[today] && taskStates[today][taskKey];
+
+            const taskElement = document.createElement('div');
+            taskElement.className = `task-item ${isCompleted ? 'completed' : ''}`;
+            taskElement.onclick = () => toggleTask(taskKey);
+
+            taskElement.innerHTML = `
+                <div class="task-checkbox ${isCompleted ? 'checked' : ''}"></div>
+                <div class="task-text">
+                    <div class="task-time">${task.time}</div>
+                    <div class="task-description">${task.description}${isPending ? ' (Pendiente)' : ''}</div>
+                </div>
+            `;
+
+            return taskElement;
+        }
+
+        function toggleTask(taskKey) {
+            const today = formatDate(currentDate);
+            
+            if (!taskStates[today]) {
+                taskStates[today] = {};
+            }
+            
+            taskStates[today][taskKey] = !taskStates[today][taskKey];
+            localStorage.setItem('taskStates', JSON.stringify(taskStates));
+            
+            displayDay();
+            updateProgress();
+        }
+
+        function addPendingTasksToNextDay() {
+            const today = formatDate(currentDate);
+            const tomorrow = getDateKey(1);
+            const dayData = studyPlan[today];
+            
+            if (!dayData) return;
+
+            const incompleteTasks = [];
+            
+            // Revisar tareas regulares
+            dayData.tasks.forEach((task, index) => {
+                const taskKey = `task-${index}`;
+                if (!taskStates[today] || !taskStates[today][taskKey]) {
+                    incompleteTasks.push(task);
+                }
+            });
+
+            // Revisar tareas pendientes de días anteriores
+            if (pendingTasks[today]) {
+                pendingTasks[today].forEach((task, index) => {
+                    const taskKey = `pending-${task.originalDate}-${index}`;
+                    if (!taskStates[today] || !taskStates[today][taskKey]) {
+                        incompleteTasks.push(task);
+                    }
+                });
+            }
+
+            if (incompleteTasks.length > 0) {
+                if (!pendingTasks[tomorrow]) {
+                    pendingTasks[tomorrow] = [];
+                }
+                
+                incompleteTasks.forEach(task => {
+                    pendingTasks[tomorrow].push({
+                        ...task,
+                        originalDate: task.originalDate || today
+                    });
+                });
+                
+                localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
+            }
+        }
+
+        function displayDay() {
+            const today = formatDate(currentDate);
+            const dayData = studyPlan[today];
+            const daySection = document.getElementById('daySection');
+
+            if (!dayData) {
+                daySection.innerHTML = `
+                    <div class="day-title">
+                        <div class="day-icon">?</div>
+                        Sin actividades programadas
+                    </div>
+                    <p>No hay actividades programadas para este día.</p>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="day-title ${dayData.isExam ? 'exam-day' : ''}">
+                    <div class="day-icon">${dayData.isExam ? '📝' : '📚'}</div>
+                    ${dayData.title}
+                    ${dayData.isExam ? `<span class="exam-indicator">EXAMEN</span>` : ''}
+                </div>
+            `;
+
+            // Mostrar tareas pendientes si las hay
+            if (pendingTasks[today] && pendingTasks[today].length > 0) {
+                html += `
+                    <div class="pending-tasks">
+                        <h4>⚠️ Tareas pendientes de días anteriores:</h4>
+                `;
+                
+                pendingTasks[today].forEach((task, index) => {
+                    const taskElement = createTaskElement(task, index, true, task.originalDate);
+                    html += taskElement.outerHTML;
+                });
+                
+                html += `</div>`;
+            }
+
+            // Mostrar tareas del día
+            dayData.tasks.forEach((task, index) => {
+                const taskElement = createTaskElement(task, index);
+                html += taskElement.outerHTML;
+            });
+
+            html += `
+                <button class="reset-button" onclick="resetDay()">
+                    🔄 Reiniciar día
+                </button>
+            `;
+
+            daySection.innerHTML = html;
+
+            // Agregar event listeners a las tareas
+            const taskItems = daySection.querySelectorAll('.task-item');
+            taskItems.forEach((item, index) => {
+                const isPendingTask = item.querySelector('.task-description').textContent.includes('(Pendiente)');
+                let taskKey;
+                
+                if (isPendingTask) {
+                    const pendingIndex = index - (pendingTasks[today] ? pendingTasks[today].findIndex((_, i) => i === index) : 0);
+                    const originalDate = pendingTasks[today] ? pendingTasks[today][pendingIndex]?.originalDate : today;
+                    taskKey = `pending-${originalDate}-${pendingIndex}`;
+                } else {
+                    const regularTaskIndex = index - (pendingTasks[today] ? pendingTasks[today].length : 0);
+                    taskKey = `task-${regularTaskIndex}`;
+                }
+                
+                item.onclick = () => toggleTask(taskKey);
+            });
+
+            updateNavigation();
+        }
+
+        function updateNavigation() {
+            const prevButton = document.getElementById('prevDay');
+            const nextButton = document.getElementById('nextDay');
+            
+            const today = new Date();
+            const firstDay = new Date('2024-09-24');
+            const lastDay = new Date('2024-10-19');
+            
+            prevButton.disabled = currentDate <= firstDay;
+            nextButton.disabled = currentDate >= lastDay;
+        }
+
+        function navigateDay(direction) {
+            if (direction === 1) {
+                addPendingTasksToNextDay();
+            }
+            
+            currentDate.setDate(currentDate.getDate() + direction);
+            displayCurrentDate();
+            displayDay();
+            updateProgress();
+        }
+
+        function resetDay() {
+            if (confirm('¿Estás seguro de que quieres reiniciar todas las tareas de hoy?')) {
+                const today = formatDate(currentDate);
+                if (taskStates[today]) {
+                    delete taskStates[today];
+                }
+                if (pendingTasks[today]) {
+                    delete pendingTasks[today];
+                }
+                localStorage.setItem('taskStates', JSON.stringify(taskStates));
+                localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
+                displayDay();
+                updateProgress();
+            }
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            // Establecer la fecha actual como 24 de septiembre de 2024 para empezar el plan
+            currentDate = new Date('2024-09-24');
+            
+            displayCurrentDate();
+            displayDay();
+            updateProgress();
+
+            // Event listeners para navegación
+            document.getElementById('prevDay').addEventListener('click', () => navigateDay(-1));
+            document.getElementById('nextDay').addEventListener('click', () => navigateDay(1));
+
+            // Agregar función resetDay al scope global
+            window.resetDay = resetDay;
+        });
+
+        // Función para saltar a una fecha específica (útil para testing)
+        function jumpToDate(dateString) {
+            currentDate = new Date(dateString);
+            displayCurrentDate();
+            displayDay();
+            updateProgress();
+        }
+
+        // Hacer disponible globalmente para debugging
+        window.jumpToDate = jumpToDate;
+
+        // Auto-guardar cada 30 segundos
+        setInterval(() => {
+            localStorage.setItem('taskStates', JSON.stringify(taskStates));
+            localStorage.setItem('pendingTasks', JSON.stringify(pendingTasks));
+        }, 30000);
+    </script>
+</body>
+</html>
